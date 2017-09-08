@@ -4,6 +4,20 @@
 #include <cstddef>
 #include <type_traits>
 
+/** @file LocalPtr.h
+ *
+ *  Manage dynamic memory with automatic cleanup.
+ *  There can be three types of pointers. The first acts as a regular
+ *  one, meaning that no deleter is set. In this case it is presumed
+ *  that ownership will be transfered before garbage collection should
+ *  be called -- it is for convenience.
+ *  
+ *  The second and third kind have a valid deleter, it is either a class
+ *  or a function. Usually, the class kind is used, as it offers more
+ *  functionality. For basic pointers, such as FILE pointers, ones returned
+ *  from new[] and malloc, wrapper classes have been declared.
+ */
+
 namespace Cellwars
 {
     void DefaultDeleter (void* p);
@@ -53,6 +67,10 @@ namespace Cellwars
         U Deleter;
     };
 };
+
+#include "NewPtr.h"
+#include "MallocPtr.h"
+#include "FilePtr.h"
 
 #include "LocalPtr.inl"
 

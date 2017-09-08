@@ -5,3 +5,4 @@ int main ()
     Cellwars::Application().GetInstance().Load ();
     return 0;
 }
+

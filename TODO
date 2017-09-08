@@ -2,3 +2,4 @@
 2) Use new log*Str where applicable
 
 3) BoolVector
+4) create exception class which loggs file, function and line automatically

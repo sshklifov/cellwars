@@ -4,7 +4,7 @@ INCLUDEDIR=${PREFIX}/include/Container
 
 OPT=-Wall -Wextra -Werror -fmax-errors=1 -fno-rtti -ggdb
 INC=-I${PREFIX}/include $(pkg-config --cflags glfw3 glm)
-LOCAL_LIB=-L${LIBDIR} -lapplication -lrenderutils -lepsilon -lhieroparser -lcontainer -lmisc -llogger -lglad
+LOCAL_LIB=-L${LIBDIR} -lapplication -lrenderutils -lepsilon -lhieroparser -lmisc -lcontainer -lmisc -llogger -lglad
 SYSTEM_LIB=$(shell pkg-config --libs glfw3 glm) -ldl
 
 default: main
