@@ -1,0 +1,74 @@
+#include <Container/String.h>
+#include <iostream>
+
+using namespace Cellwars;
+using namespace std;
+
+void first_pass ()
+{
+    String s ("123");
+    logAssert (s.Size () == 3);
+    logAssert (s[0] == '1' && s[1] == '2' && s[2] == '3');
+
+    s.Resize (5);
+    logAssert (s.Size () == 5);
+
+    s[3] = 3;
+    s[4] = 4;
+
+    s.ShrinkToFit ();
+    logAssert (s.Capacity () == s.Size ());
+}
+
+void second_pass ()
+{
+    const char* s = "12345678";
+    String str (s, 5);
+
+    logAssert (str.Front () == '5' && str.Back () == '1');
+
+    str.Back () = '3';
+    logAssert (str[0] == '3');
+
+    String str2 = str.Substr (3);
+    logAssert (str2.Size () == 2);
+    logAssert (str2[0] == '4' && str2[1] == '5');
+
+    str2.Append ('8', 5);
+    logAssert (str2.Size () == 7);
+    logAssert (str2[6] == '8');
+}
+
+void third_pass ()
+{
+    cout << "Trying Getline on string... Enter a line: ";
+    String str;
+    Getline (cin, str);
+
+    str.NullTerminate ();
+    cout << "You enterned : " << str.CStr () << endl;
+    cout << "Size: " << str.Size ();
+}
+
+void forth_pass ()
+{
+    char buf[] = "abcdefabcedfaaaabc";
+    StringSegment str (buf);
+
+    logAssert (str.Find ("def") == 3);
+    logAssert (str.Find ("abc", 3));
+    
+}
+
+void print_success ()
+{
+    logDebug ("Pass");
+}
+
+int main ()
+{
+    first_pass ();
+    second_pass ();
+    third_pass ();
+    print_success ();
+}
