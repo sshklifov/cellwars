@@ -36,18 +36,18 @@ extern "C" {
  *  {
  */
 #ifndef NDEBUG
-  #define logDebug(args...) logDebug_Impl (__FILE__, __FUNCTION__, __LINE__, args)
-  #define logDebugStr(x) logDebugStr_Impl (__FILE__, __FUNCTION__, __LINE__, x)
+  #define logDebug(args...) _logDebug (__FILE__, __FUNCTION__, __LINE__, args)
+  #define logDebugStr(x) _logDebugStr (__FILE__, __FUNCTION__, __LINE__, x)
 #else
   #define logDebug
 #endif
-  #define logWarn(args...) logWarn_Impl (__FILE__, __FUNCTION__, __LINE__, args)
-  #define logError(args...) logError_Impl (__FILE__, __FUNCTION__, __LINE__, args)
-  #define logCrit(args...) logCrit_Impl (__FILE__, __FUNCTION__, __LINE__, args)
+  #define logWarn(args...) _logWarn (__FILE__, __FUNCTION__, __LINE__, args)
+  #define logError(args...) _logError (__FILE__, __FUNCTION__, __LINE__, args)
+  #define logCrit(args...) _logCrit (__FILE__, __FUNCTION__, __LINE__, args)
 
-  #define logWarnStr(x) logWarnStr_Impl (__FILE__, __FUNCTION__, __LINE__, x)
-  #define logErrorStr(x) logErrorStr_Impl (__FILE__, __FUNCTION__, __LINE__, x)
-  #define logCritStr(x) logCritStr_Impl (__FILE__, __FUNCTION__, __LINE__, x)
+  #define logWarnStr(x) _logWarnStr (__FILE__, __FUNCTION__, __LINE__, x)
+  #define logErrorStr(x) _logErrorStr (__FILE__, __FUNCTION__, __LINE__, x)
+  #define logCritStr(x) _logCritStr (__FILE__, __FUNCTION__, __LINE__, x)
 /*! }
  */
 

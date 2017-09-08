@@ -8,11 +8,6 @@
 #include <errno.h>
 #include <string.h>
 
-/* NOTE: defining GNU_SOURCE is important becuase there are two different strerror_r
- * functions. Since we are using GNU extensions and the feature test macro defines some
- * meaningful other feature test macro, we will use the GNU variant of strerror_r.
- */
-
 static void logErrcode (int errcode)
 {
     const unsigned LOCALBUFSIZ = 256;
@@ -69,12 +64,12 @@ static void logStrHelper (const char* type, const char* file, const char* fun, i
     printf ("%s\n\n", str);
 }
 
-void logDebugStr_Impl (const char* file, const char* fun, int line, const char* str)
+void _logDebugStr (const char* file, const char* fun, int line, const char* str)
 {
     logStrHelper ("debug", file, fun, line, str);
 }
 
-void logDebug_Impl (const char* file, const char* fun, int line, const char* fmt, ...)
+void _logDebug (const char* file, const char* fun, int line, const char* fmt, ...)
 {
     va_list args;
     char buf[LOGGER_BUF_CAP];
@@ -83,15 +78,15 @@ void logDebug_Impl (const char* file, const char* fun, int line, const char* fmt
     vsnprintf (buf, LOGGER_BUF_CAP, fmt, args);
     va_end (args);
 
-    logDebugStr_Impl (file, fun, line, buf);
+    _logDebugStr (file, fun, line, buf);
 }
 
-void logWarnStr_Impl (const char* file, const char* fun, int line, const char* str)
+void _logWarnStr (const char* file, const char* fun, int line, const char* str)
 {
     logStrHelper ("warning", file, fun, line, str);
 }
 
-void logWarn_Impl (const char* file, const char* fun, int line, const char* fmt, ...)
+void _logWarn (const char* file, const char* fun, int line, const char* fmt, ...)
 {
     va_list args;
     char buf[LOGGER_BUF_CAP];
@@ -100,15 +95,15 @@ void logWarn_Impl (const char* file, const char* fun, int line, const char* fmt,
     vsnprintf (buf, LOGGER_BUF_CAP, fmt, args);
     va_end (args);
 
-    logWarnStr_Impl (file, fun, line, buf);
+    _logWarnStr (file, fun, line, buf);
 }
 
-void logErrorStr_Impl (const char* file, const char* fun, int line, const char* str)
+void _logErrorStr (const char* file, const char* fun, int line, const char* str)
 {
     logStrHelper ("error", file, fun, line, str);
 }
 
-void logError_Impl (const char* file, const char* fun, int line, const char* fmt, ...)
+void _logError (const char* file, const char* fun, int line, const char* fmt, ...)
 {
     va_list args;
     char buf[LOGGER_BUF_CAP];
@@ -117,16 +112,16 @@ void logError_Impl (const char* file, const char* fun, int line, const char* fmt
     vsnprintf (buf, LOGGER_BUF_CAP, fmt, args);
     va_end (args);
 
-    logErrorStr_Impl (file, fun, line, buf);
+    _logErrorStr (file, fun, line, buf);
 }
 
-void logCritStr_Impl (const char* file, const char* fun, int line, const char* str)
+void _logCritStr (const char* file, const char* fun, int line, const char* str)
 {
     logStrHelper ("critical", file, fun, line, str);
     abort ();
 }
 
-void logCrit_Impl (const char* file, const char* fun, int line, const char* fmt, ...)
+void _logCrit (const char* file, const char* fun, int line, const char* fmt, ...)
 {
     va_list args;
     char buf[LOGGER_BUF_CAP];
@@ -135,5 +130,14 @@ void logCrit_Impl (const char* file, const char* fun, int line, const char* fmt,
     vsnprintf (buf, LOGGER_BUF_CAP, fmt, args);
     va_end (args);
 
-    logCritStr_Impl (file, fun, line, buf);
+    _logCritStr (file, fun, line, buf);
+}
+
+void logReopen (const char* path)
+{
+    stdout = freopen (path, "a", stdout);
+    if (stdout == NULL)
+    {
+        abort ();
+    }
 }
