@@ -26,40 +26,18 @@ bool Cellwars::IsNegative (T x)
     return x < (T)0;
 }
 
+
 template <typename T>
 bool Cellwars::IsEqual (T lhs, T rhs)
 {
     return lhs == rhs;
 }
 
-/* template<> */
-/* bool Cellwars::IsEqual (float lhs, float rhs) */
-/* { */
-/*     return AlmostRelEq (lhs, rhs); */
-/* } */
-
-/* template<> */
-/* bool Cellwars::IsEqual (double lhs, double rhs) */
-/* { */
-/*     return AlmostRelEq (lhs, rhs); */
-/* } */
-
 template <typename T>
 bool Cellwars::IsLess (T lhs, T rhs)
 {
     return lhs < rhs;
 }
-
-/* template<> */
-/* bool Cellwars::IsLess (float lhs, float rhs) */
-/* { */
-/*     return lhs < rhs && !IsEqual (lhs, rhs); */
-/* } */
-/* template<> */
-/* bool Cellwars::IsLess (double lhs, double rhs) */
-/* { */
-/*     return lhs < rhs && !IsEqual (lhs, rhs); */
-/* } */
 
 template <typename T>
 bool Cellwars::IsGreater (T lhs, T rhs)

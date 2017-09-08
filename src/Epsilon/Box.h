@@ -1,13 +1,8 @@
 /*! @file Box.h
  *
- *  Defines a rectangular type. There can be many representations,
- *  so the struct Box defines member function to support such
- *  representations. It offers -- for flexibility, public member
- *  variables. This approach has both advantages and disadvantages.
- *
- *  This class cannot be expanded much in the future, so chosing to
- *  grant access to memeber variables is not a bad implementation
- *  decision.
+ *  Defines a rectangular type.
+ *  There can be many representations, so the struct Box defines member function
+ *  to support such representations.
  */
 
 #ifndef BOX_INCLUDED
@@ -34,23 +29,23 @@ namespace Cellwars
         Box (const point_t& p, length_t width, length_t height);
         Box& operator= (const Box& rhs) = default;
 
-        length_t GetWidth () const;
-        length_t GetHeight () const;
+        const length_t GetWidth () const;
+        const length_t GetHeight () const;
 
-        point_t GetBotLeft () const;
-        point_t GetBotRight () const;
-        point_t GetTopLeft () const;
-        point_t GetTopRight () const;
+        const point_t GetBotLeft () const;
+        const point_t GetBotRight () const;
+        const point_t GetTopLeft () const;
+        const point_t GetTopRight () const;
 
-        line_t GetLeft () const;
-        line_t GetRight () const;
-        line_t GetBot () const;
-        line_t GetTop () const;
+        const line_t GetLeft () const;
+        const line_t GetRight () const;
+        const line_t GetBot () const;
+        const line_t GetTop () const;
 
-        coord_t GetLowerY () const;
-        coord_t GetUpperY () const;
-        coord_t GetLowerX () const;
-        coord_t GetUpperX () const;
+        const coord_t GetLowerY () const;
+        const coord_t GetUpperY () const;
+        const coord_t GetLowerX () const;
+        const coord_t GetUpperX () const;
 
     public:
         Point2<coord_t> botleft;

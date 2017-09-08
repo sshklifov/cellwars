@@ -1,7 +1,7 @@
 /*! @file Types.h
  *
  *  Defines some useful types, which are used internally.
- *  That means that it should not be included standalone.
+ *  This means that it should not be included standalone.
  */
 
 #ifndef TYPES_INCLUDED

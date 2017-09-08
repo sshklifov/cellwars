@@ -4,6 +4,13 @@
 #include "Types.h"
 #include "Point.h"
 
+/*! @file Circle.h
+ *
+ *  Declares a 2D circle type.
+ *  Mainly used as a container. Currently, it does not provide any functionality. Of course,
+ *  this is subject to change.
+ */
+
 namespace Cellwars
 {
     template <typename T>

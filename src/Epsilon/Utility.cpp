@@ -1,31 +1,11 @@
 #include "Utility.h"
 
-typename Cellwars::IntWithSize<sizeof (float)>::type FloatBitsToInt (float x)
-{
-    return *((Cellwars::IntWithSize<sizeof (float)>::type*)(&x));
-}
-
-typename Cellwars::IntWithSize<sizeof (double)>::type FloatBitsToint (double x)
-{
-    return *((Cellwars::IntWithSize<sizeof (double)>::type*)(&x));
-}
-
-typename Cellwars::UintWithSize<sizeof (float)>::type FloatBitsToUInt (float x)
-{
-    return *((Cellwars::UintWithSize<sizeof (float)>::type*)(&x));
-}
-
-typename Cellwars::UintWithSize<sizeof (double)>::type FloatBitsToUint (double x)
-{
-    return *((Cellwars::UintWithSize<sizeof (double)>::type*)(&x));
-}
-
 float Cellwars::IntBitsToFloat (Cellwars::IntWithSize<sizeof (float)>::type x)
 {
     return *((float*)(&x));
 }
 
-float Cellwars::IntBitsToFloat (Cellwars::UintWithSize<sizeof (float)>::type x)
+float Cellwars::UintBitsToFloat (Cellwars::UintWithSize<sizeof (float)>::type x)
 {
     return *((float*)(&x));
 }
@@ -35,9 +15,29 @@ double Cellwars::IntBitsToDouble (Cellwars::IntWithSize<sizeof (double)>::type x
     return *((double*)(&x));
 }
 
-double Cellwars::IntBitsToDouble (Cellwars::UintWithSize<sizeof (double)>::type x)
+double Cellwars::UintBitsToDouble (Cellwars::UintWithSize<sizeof (double)>::type x)
 {
     return *((double*)(&x));
+}
+
+typename Cellwars::IntWithSize<sizeof (float)>::type Cellwars::FloatBitsToInt (float x)
+{
+    return *((Cellwars::IntWithSize<sizeof (float)>::type*)(&x));
+}
+
+typename Cellwars::IntWithSize<sizeof (double)>::type Cellwars::DoubleBitsToInt (double x)
+{
+    return *((Cellwars::IntWithSize<sizeof (double)>::type*)(&x));
+}
+
+typename Cellwars::UintWithSize<sizeof (float)>::type Cellwars::FloatBitsToUint (float x)
+{
+    return *((Cellwars::UintWithSize<sizeof (float)>::type*)(&x));
+}
+
+typename Cellwars::UintWithSize<sizeof (double)>::type Cellwars::DoubleBitsToUint (double x)
+{
+    return *((Cellwars::UintWithSize<sizeof (double)>::type*)(&x));
 }
 
 template<>

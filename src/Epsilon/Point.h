@@ -3,8 +3,17 @@
 
 #include "Vec.h"
 
+/*! @file Point.h
+ *
+ *  Decares a 2D point.
+ *  Generally, a point can be represented in a single way -- with x, y
+ *  coordinates. This is why the Point2 type is a struct, not a class.
+ *  It's member variables are public; there is no encapsulation.
+ */
+
 namespace Cellwars
 {
+    // Depedency cicle -- use forward declaration in both files
     template <typename T>
     struct Vec2;
 

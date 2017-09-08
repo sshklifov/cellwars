@@ -4,6 +4,16 @@
 #include "Vec.h"
 #include "Point.h"
 
+/*! @file Line.h
+ *
+ *  Declares a 2D line.
+ *  A line can be represented width a line equation or a a pair of
+ *  tanger/offset values. Both have advantages and disadvantages.
+ *  So both representation are accessible.
+ *
+ *  Plus some functionality is also defined.
+ */
+
 namespace Cellwars
 {
     template <typename T>

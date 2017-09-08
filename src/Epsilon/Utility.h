@@ -20,9 +20,9 @@ namespace Cellwars
      */
 
     float IntBitsToFloat (IntWithSize<sizeof (float)>::type x);
-    float IntBitsToFloat (UintWithSize<sizeof (float)>::type x);
+    float UintBitsToFloat (UintWithSize<sizeof (float)>::type x);
     double IntBitsToDouble (IntWithSize<sizeof (double)>::type x);
-    double IntBitsToDouble (UintWithSize<sizeof (double)>::type x);
+    double UintBitsToDouble (UintWithSize<sizeof (double)>::type x);
 
     /*! @brief Cast int bits to float with equivalent size.
      *
@@ -31,9 +31,9 @@ namespace Cellwars
      */
 
     typename IntWithSize<sizeof (float)>::type FloatBitsToInt (float x);
-    typename IntWithSize<sizeof (double)>::type FloatBitsToInt (double x);
-    typename UintWithSize<sizeof (float)>::type FloatBitsToUInt (float x);
-    typename UintWithSize<sizeof (double)>::type FloatBitsToUInt (double x);
+    typename IntWithSize<sizeof (double)>::type DoubleBitsToInt (double x);
+    typename UintWithSize<sizeof (float)>::type FloatBitsToUint (float x);
+    typename UintWithSize<sizeof (double)>::type DoubleBitsToUint (double x);
 
     /*! @brief Internal function for comparing floats.
      *
