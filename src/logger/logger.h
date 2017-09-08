@@ -85,31 +85,31 @@ extern "C" {
  * {
  */
 __attribute__((format(printf, 4, 5)))
-extern void logDebug_Impl (const char* file, const char* fun, int line,
+extern void _logDebug (const char* file, const char* fun, int line,
         const char* fmt, ...);
 
 __attribute__((format(printf, 4, 5)))
-extern void logWarn_Impl (const char* file, const char* fun, int line,
+extern void _logWarn (const char* file, const char* fun, int line,
         const char* fmt, ...);
 
 __attribute__((format(printf, 4, 5)))
-extern void logError_Impl (const char* file, const char* fun, int line,
+extern void _logError (const char* file, const char* fun, int line,
         const char* fmt, ...);
 
 __attribute__((format(printf, 4, 5)))
-extern void logCrit_Impl (const char* file, const char* fun, int line,
+extern void _logCrit (const char* file, const char* fun, int line,
         const char* fmt, ...);
 
-extern void logDebugStr_Impl (const char* file, const char* fun, int line,
+extern void _logDebugStr (const char* file, const char* fun, int line,
         const char* fmt);
 
-extern void logWarnStr_Impl (const char* file, const char* fun, int line,
+extern void _logWarnStr (const char* file, const char* fun, int line,
         const char* fmt);
 
-extern void logErrorStr_Impl (const char* file, const char* fun, int line,
+extern void _logErrorStr (const char* file, const char* fun, int line,
         const char* fmt);
 
-extern void logCritStr_Impl (const char* file, const char* fun, int line,
+extern void _logCritStr (const char* file, const char* fun, int line,
         const char* fmt);
 
 /*! }
