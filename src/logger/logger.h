@@ -62,7 +62,7 @@ extern "C" {
   {                                                                 \
     if (!(x))                                                       \
     {                                                               \
-        logCrit_Impl (__FILE__, __PRETTY_FUNCTION__, __LINE__,      \
+        _logCrit (__FILE__, __PRETTY_FUNCTION__, __LINE__,      \
                 "assertion failed: \'"  #x  "\'");                  \
     }                                                               \
   }                                                                 \
