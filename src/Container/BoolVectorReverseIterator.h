@@ -2,7 +2,13 @@
 #define BOOL_VECTOR_REVERSE_ITERATOR_INCLUDED
 
 #include "BoolVector.h"
-#include "Iterator.h"
+#include "IteratorTag.h"
+
+/*! @file BoolVectorReverseIterator.h
+ *
+ *  Random-access reverse iterator class for BoolVector.
+ *  @sa @file IteratorTag.h
+ */
 
 namespace Cellwars
 {
@@ -18,7 +24,7 @@ namespace Cellwars
 
     public:
         BoolVectorReverseIterator ();
-        BoolVectorReverseIterator (T* p, unsigned offset);
+        BoolVectorReverseIterator (T* p, DifferenceType offset);
         BoolVectorReverseIterator (const BoolVectorReverseIterator& rhs) = default;
         BoolVectorReverseIterator& operator= (const BoolVectorReverseIterator& rhs) = default;
 

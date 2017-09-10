@@ -146,7 +146,8 @@ Cellwars::ReverseRandomAccessIterator<T> Cellwars::ReverseRandomAccessIterator<T
 }
 
 template <typename T>
-typename Cellwars::ReverseRandomAccessIterator<T>::DifferenceType Cellwars::ReverseRandomAccessIterator<T>::operator- (ReverseRandomAccessIterator rhs)
+typename Cellwars::ReverseRandomAccessIterator<T>::DifferenceType
+Cellwars::ReverseRandomAccessIterator<T>::operator- (ReverseRandomAccessIterator rhs)
 {
     return rhs.p - p;
 }
@@ -176,7 +177,8 @@ bool Cellwars::ReverseRandomAccessIterator<T>::operator>= (ReverseRandomAccessIt
 }
 
 template <typename T>
-typename Cellwars::ReverseRandomAccessIterator<T>::Reference Cellwars::ReverseRandomAccessIterator<T>::operator[] (unsigned n)
+typename Cellwars::ReverseRandomAccessIterator<T>::Reference
+Cellwars::ReverseRandomAccessIterator<T>::operator[] (unsigned n)
 {
     return *((*this) + n);
 }

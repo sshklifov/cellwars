@@ -146,7 +146,8 @@ Cellwars::RandomAccessIterator<T> Cellwars::RandomAccessIterator<T>::operator- (
 }
 
 template <typename T>
-typename Cellwars::RandomAccessIterator<T>::DifferenceType Cellwars::RandomAccessIterator<T>::operator- (RandomAccessIterator rhs)
+typename Cellwars::RandomAccessIterator<T>::DifferenceType
+Cellwars::RandomAccessIterator<T>::operator- (RandomAccessIterator rhs)
 {
     return p - rhs.p;
 }

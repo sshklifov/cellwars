@@ -8,7 +8,7 @@ Cellwars::BoolVectorReverseIterator<T>::BoolVectorReverseIterator ()
 }
 
 template <typename T>
-Cellwars::BoolVectorReverseIterator<T>::BoolVectorReverseIterator (T* p, unsigned offset) : it (p, offset)
+Cellwars::BoolVectorReverseIterator<T>::BoolVectorReverseIterator (T* p, DifferenceType offset) : it (p, offset)
 {
 }
 
@@ -25,7 +25,8 @@ bool Cellwars::BoolVectorReverseIterator<T>::operator!= (const Cellwars::BoolVec
 }
 
 template <typename T>
-typename Cellwars::BoolVectorReverseIterator<T>::ConstReference Cellwars::BoolVectorReverseIterator<T>::operator* () const
+typename Cellwars::BoolVectorReverseIterator<T>::ConstReference
+Cellwars::BoolVectorReverseIterator<T>::operator* () const
 {
     return *it;
 }
@@ -37,13 +38,15 @@ typename Cellwars::BoolVectorReverseIterator<T>::Reference Cellwars::BoolVectorR
 }
 
 template <typename T>
-typename Cellwars::BoolVectorReverseIterator<T>::ConstReference Cellwars::BoolVectorReverseIterator<T>::operator[] (unsigned idx) const
+typename Cellwars::BoolVectorReverseIterator<T>::ConstReference
+Cellwars::BoolVectorReverseIterator<T>::operator[] (unsigned idx) const
 {
     return *((*this) - idx);
 }
 
 template <typename T>
-typename Cellwars::BoolVectorReverseIterator<T>::Reference Cellwars::BoolVectorReverseIterator<T>::operator[] (unsigned idx)
+typename Cellwars::BoolVectorReverseIterator<T>::Reference
+Cellwars::BoolVectorReverseIterator<T>::operator[] (unsigned idx)
 {
     return *((*this) - idx);
 }
@@ -113,7 +116,8 @@ Cellwars::BoolVectorReverseIterator<T> Cellwars::BoolVectorReverseIterator<T>::o
 }
 
 template <typename T>
-typename Cellwars::BoolVectorReverseIterator<T>::DifferenceType Cellwars::BoolVectorReverseIterator<T>::operator- (const Cellwars::BoolVectorReverseIterator<T>& rhs) const
+typename Cellwars::BoolVectorReverseIterator<T>::DifferenceType
+Cellwars::BoolVectorReverseIterator<T>::operator- (const Cellwars::BoolVectorReverseIterator<T>& rhs) const
 {
     return rhs.it - it;
 }

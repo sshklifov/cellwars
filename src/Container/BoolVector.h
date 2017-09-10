@@ -6,6 +6,14 @@
 
 #include <cstdint>
 
+/*! @file BoolVector.h
+ *
+ *  A vector of bools.
+ *  Instead of specializing Vector<bool>, a standalone class is provided.
+ *  It can do pretty much what a Vector can do, and a little bit more.
+ *  The reason not to use vector<bool> is memory inefficiency.
+ */
+
 namespace Cellwars
 {
     template <typename T>
@@ -24,7 +32,6 @@ namespace Cellwars
 
     public:
         class Proxy;
-        class ConstProxy;
 
     public:
         using Iterator = BoolVectorIterator<ValueType>;
@@ -47,7 +54,6 @@ namespace Cellwars
         static constexpr unsigned MaxSize ();
         unsigned Capacity () const;
         unsigned Size () const;
-        unsigned Buckets () const;
 
         void PushBack (bool val);
         void PushBack (bool val, unsigned n);
@@ -55,6 +61,7 @@ namespace Cellwars
         void Reserve (unsigned req_bits);
         void Resize (unsigned req_bits);
         void RelativeResize (unsigned req_bits);
+        void ClosestRelativeResize (unsigned req_bits);
         void ShrinkToFit ();
         void Clear ();
         void Swap (BoolVector& rhs);
@@ -68,8 +75,6 @@ namespace Cellwars
         ConstReverseIterator CRBegin () const;
         ConstReverseIterator CREnd () const;
 
-        const ValueType* Data () const;
-        ValueType* Data ();
         bool Front () const;
         Proxy Front ();
         bool Back () const;
@@ -95,8 +100,6 @@ namespace Cellwars
 
     class BoolVector::Proxy
     {
-        friend BoolVector::ConstProxy;
-
     public:
         explicit Proxy (BoolVector::ValueType* p, unsigned offset);
         Proxy (const Proxy& rhs) = default;
@@ -111,21 +114,6 @@ namespace Cellwars
 
     private:
         BoolVector::ValueType* p;
-        unsigned offset;
-    };
-
-    class BoolVector::ConstProxy
-    {
-    public:
-        explicit ConstProxy (const BoolVector::ValueType* p, unsigned offset);
-        ConstProxy (const ConstProxy& rhs) = default;
-        ConstProxy (const Proxy& rhs);
-        void operator= (const Proxy&) = delete;
-
-        operator bool () const;
-
-    private:
-        const BoolVector::ValueType* p;
         unsigned offset;
     };
 };

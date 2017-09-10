@@ -2,9 +2,15 @@
 #define BOOL_VECTOR_ITERATOR_INCLUDED
 
 #include "BoolVector.h"
-#include "Iterator.h"
+#include "IteratorTag.h"
 
 #include <type_traits>
+
+/*! @file BoolVectorIterator.h
+ *
+ *  Random-access iterator class for BoolVector.
+ *  @sa @file IteratorTag.h
+ */
 
 namespace Cellwars
 {
@@ -15,15 +21,16 @@ namespace Cellwars
         using Category = RandomAccessIteratorTag;
         using ValueType = T;
         using DifferenceType = ptrdiff_t;
-        using Reference = typename std::conditional<std::is_const<T>::value, bool, BoolVector::Proxy>::type;
-        using ConstReference = bool;
+        using Reference = typename std::conditional<
+            std::is_const<T>::value,
+            const BoolVector::Proxy,
+            BoolVector::Proxy>::type;
 
-    private:
-        using ProxyType = typename std::conditional<std::is_const<T>::value, BoolVector::ConstProxy, BoolVector::Proxy>::type;
+        using ConstReference = bool;
 
     public:
         BoolVectorIterator ();
-        BoolVectorIterator (T* p, unsigned offset);
+        BoolVectorIterator (T* p, DifferenceType offset);
 
         BoolVectorIterator (const BoolVectorIterator& rhs) = default;
         BoolVectorIterator& operator= (const BoolVectorIterator& rhs) = default;
@@ -55,7 +62,7 @@ namespace Cellwars
 
     private:
         T* p;
-        unsigned offset;
+        DifferenceType offset;
     };
 };
 

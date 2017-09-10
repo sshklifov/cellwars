@@ -1,7 +1,8 @@
 #ifndef REVERSE_ITERATOR_INCLUDED
 #define REVERSE_ITERATOR_INCLUDED
 
-#include "Iterator.h"
+#include "IteratorTag.h"
+#include <cstddef>
 
 namespace Cellwars
 {

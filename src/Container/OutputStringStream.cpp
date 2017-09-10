@@ -3,7 +3,7 @@
 using Cellwars::StringStreamState;
 using Cellwars::OutputStringStream;
 
-OutputStringStream::OutputStringStream (String str) : str (str)
+OutputStringStream::OutputStringStream (String str) : str (std::move (str))
 {
 }
 

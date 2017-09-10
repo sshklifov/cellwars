@@ -24,7 +24,7 @@ Cellwars::Vector<T>::Vector (std::initializer_list<T> l) : Vector ()
 template <typename T>
 Cellwars::Vector<T>::Vector (unsigned n) : Vector ()
 {
-    Reserve (n);
+    Resize (n);
 }
 
 template <typename T>
@@ -102,9 +102,8 @@ void Cellwars::Vector<T>::EmplaceBack (Args&&... val)
 {
     logAssert (MaxSize () - 1 >= Size ());
 
-    Resize (Size () + 1);
-    T res = T (std::forward<Args> (val)...);
-    /* Front () = T (std::forward<Args> (val)...); */
+    RelativeResize (1);
+    Back () = T (std::forward<Args> (val)...);
 }
 
 template <typename T>
@@ -112,8 +111,8 @@ void Cellwars::Vector<T>::PushBack (const T& val)
 {
     logAssert (MaxSize () - 1 >= Size ());
 
-    Resize (Size () + 1);
-    Front () = val;
+    RelativeResize (1);
+    Back () = val;
 }
 
 template <typename T>
@@ -138,7 +137,7 @@ void Cellwars::Vector<T>::PushBack (InputIt it, unsigned n)
 {
     logAssert (MaxSize () - n >= Size ());
 
-    Resize (Size () + n);
+    RelativeResize (n);
     Copy (it, n, End () - n);
 }
 
@@ -155,6 +154,13 @@ void Cellwars::Vector<T>::Resize (unsigned req_size)
 
 template <typename T>
 void Cellwars::Vector<T>::RelativeResize (unsigned req_size)
+{
+    logAssert (req_size <= MaxSize () - Size ());
+    Resize (Size () + req_size);
+}
+
+template <typename T>
+void Cellwars::Vector<T>::ClosestRelativeResize (unsigned req_size)
 {
     logAssert (Size () != MaxSize () || req_size != 0);
 
@@ -279,25 +285,25 @@ T* Cellwars::Vector<T>::Data ()
 }
 
 template <typename T>
-T& Cellwars::Vector<T>::Front ()
+T& Cellwars::Vector<T>::Back ()
 {
     return *RBegin ();
 }
 
 template <typename T>
-const T& Cellwars::Vector<T>::Front () const
+const T& Cellwars::Vector<T>::Back () const
 {
     return *CRBegin ();
 }
 
 template <typename T>
-T& Cellwars::Vector<T>::Back ()
+T& Cellwars::Vector<T>::Front ()
 {
     return *Begin ();
 }
 
 template <typename T>
-const T& Cellwars::Vector<T>::Back () const
+const T& Cellwars::Vector<T>::Front () const
 {
     return *CBegin ();
 }
@@ -353,6 +359,6 @@ void Cellwars::Vector<T>::ShallowCopy (Vector&& rhs)
 
     rhs.arr = NULL;
     rhs.size = 0;
-    capacity = 0;
+    rhs.capacity = 0;
 }
 

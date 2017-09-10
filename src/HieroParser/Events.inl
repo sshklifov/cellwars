@@ -16,7 +16,8 @@ Cellwars::EventRegisterer<Watcher>::~EventRegisterer ()
     using EventType = typename Watcher::EventType;
     typename EventMaster<EventType>::ValueType& v = EventMaster<EventType>::GetInstance ();
 
-    delete v.Front ();
+    //TODO delete v.Front ();
+    delete v.Back ();
     v.Resize (v.Size () - 1);
 }
 

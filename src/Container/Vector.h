@@ -54,6 +54,7 @@ namespace Cellwars
         void Reserve (unsigned req_size);
         void Resize (unsigned req_size);
         void RelativeResize (unsigned req_size);
+        void ClosestRelativeResize (unsigned req_size);
         void ShrinkToFit ();
         void Clear ();
         void Swap (Vector& rhs);

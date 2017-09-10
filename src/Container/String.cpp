@@ -14,36 +14,66 @@ using ReverseIterator = String::ReverseIterator;
 using ConstReverseIterator = String::ConstReverseIterator;
 
 template <typename ForwardIt>
-static ForwardIt SearchString (ForwardIt first, ForwardIt last, unsigned n, const bool* allowed)
+static ForwardIt SearchStringForAny (ForwardIt first, ForwardIt last, unsigned n, const char* allowed)
 {
-    auto pred = [&allowed](char c)
+    bool is_allowed[256] = {0};
+    for (unsigned i = 0; allowed[i]; ++i)
+    {
+        unsigned idx = allowed[i] + 128;
+        is_allowed[idx] = 1;
+    }
+
+    auto pred = [&is_allowed](char c)
     {
         unsigned idx = c + 128;
-        return allowed[idx];
+        return is_allowed[idx];
     };
 
     return SearchN (first, last, n, pred);
 }
 
-unsigned String::Npos = MaxSize ();
-
-unsigned String::MaxSize ()
+template <typename ForwardIt>
+static ForwardIt SearchStringForNone (ForwardIt first, ForwardIt last, unsigned n, const char* not_allowed)
 {
-    return UINT_MAX;
+    bool is_not_allowed[256] = {0};
+    for (unsigned i = 0; not_allowed[i]; ++i)
+    {
+        unsigned idx = not_allowed[i] + 128;
+        is_not_allowed[idx] = 1;
+    }
+
+    auto pred = [&is_not_allowed](char c)
+    {
+        unsigned idx = c + 128;
+        return !is_not_allowed[idx];
+    };
+
+    return SearchN (first, last, n, pred);
 }
 
-String::String (unsigned n) : v (n)
+String::String ()
 {
 }
 
-String::String (const char* s) : v (ConstIterator (s), StrlenSafe (s))
+String::String (std::nullptr_t)
 {
+}
+
+String::String (unsigned n)
+{
+    Resize (n);
+}
+
+String::String (const char* s) : String (s, StrlenSafe (s))
+{
+    AppendNull ();
 }
 
 String::String (const char* s, unsigned n)
 {
-    Resize (n);
-    Copy (RandomAccessIterator<const char> (s), n, Begin ());
+    n = Min (n, StrlenSafe (s));
+    v.PushBack (RandomAccessIterator<const char> (s), n);
+    AppendNull ();
 }
 
 String& String::operator= (const char* s)
@@ -74,16 +104,25 @@ void String::Reserve (unsigned n)
 void String::Resize (unsigned req_size)
 {
     v.Resize (req_size);
+    AppendNull ();
 }
 
 void String::RelativeResize (unsigned req_size)
 {
     v.RelativeResize (req_size);
+    AppendNull ();
+}
+
+void String::ClosestRelativeResize (unsigned req_size)
+{
+    v.ClosestRelativeResize (req_size);
+    AppendNull ();
 }
 
 void String::ShrinkToFit ()
 {
     v.ShrinkToFit ();
+    AppendNull ();
 }
 
 void String::Clear ()
@@ -96,21 +135,15 @@ void String::Swap (String& rhs)
     v.Swap (rhs.v);
 }
 
-void String::NullTerminate () const 
-{
-    v.Reserve (Length () + 1);
-    v.Data()[Length ()] = '\0';
-}
-
 const char* String::CStr () const
 {
-    NullTerminate ();
+    AppendNull ();
     return v.Data ();
 }
 
 char* String::Str ()
 {
-    NullTerminate ();
+    AppendNull ();
     return v.Data ();
 }
 
@@ -191,15 +224,14 @@ char& String::operator[] (unsigned idx)
 
 String String::Substr (unsigned n) const
 {
-    if (n >= Size ()) return String ("");
-    return String (CStr () + n, Size () - n);
+    return Substr (n, Size () - n);
 }
 
 String String::Substr (unsigned n, unsigned len) const
 {
-    if (n >= Size ()) return String ("");
-    if (n + len > Size ()) len = Size () - n;
+    if (n == Npos) return String (nullptr);
 
+    logAssert (n + len <= Size ());
     return String (CStr () + n, len);
 }
 
@@ -215,14 +247,27 @@ String& String::Append (const char* s)
 
 String& String::Append (const char* s, unsigned n)
 {
+    n = Min (n, StrlenSafe (s));
     v.PushBack (ConstIterator (s), n);
+    AppendNull ();
+
     return (*this);
 }
 
 String& String::Append (char c, unsigned n)
 {
     v.PushBack (c, n);
+    AppendNull ();
+
     return (*this);
+}
+
+void String::AppendNull () const
+{
+    String* logical_const_this = const_cast<String*> (this);
+
+    logical_const_this->v.Reserve (v.Size () + 1);
+    logical_const_this->v.Data()[v.Size ()] = '\0';
 }
 
 String& String::operator+= (const String& str)
@@ -242,78 +287,65 @@ String& String::operator+= (char c)
 
 unsigned String::Find (const char* s, unsigned pos) const
 {
-    return Find_Impl (s, pos, StrlenSafe (s));
+    return Find (s, pos, StrlenSafe (s));
 }
 
 unsigned String::Find (const String& str, unsigned pos) const
 {
-    return Find_Impl (str.CStr (), pos, str.Length ());
+    return Find (str.CStr (), pos, str.Length ());
 }
 
 unsigned String::Find (const String& str, unsigned pos, unsigned n) const
 {
-    logAssert (str.Length () >= n);
-    return Find_Impl (str.CStr (), pos, n);
+    return Find (str.CStr (), pos, n);
 }
 
 unsigned String::Find (const char* s, unsigned pos, unsigned n) const
 {
-    logAssert (StrlenSafe (s) >= n);
-    return Find_Impl (s, pos, n);
-}
+    if (pos == Npos) return Npos;
+    logAssert (pos < Length ());
 
-unsigned String::Find_Impl (const char* s, unsigned pos, unsigned n) const
-{
+    n = Min (n, StrlenSafe (s));
+
     ConstIterator it = FindSubset (CBegin () + pos, CEnd (), ConstIterator (s), ConstIterator (s + n));
     return Position (it);
 }
 
 unsigned String::RFind (const char* s, unsigned pos) const
 {
-    return RFind_Impl (s, pos, StrlenSafe (s));
+    return RFind (s, pos, StrlenSafe (s));
 }
 
 unsigned String::RFind (const String& str, unsigned pos) const
 {
-    return RFind_Impl (str.CStr (), pos, str.Length ());
+    return RFind (str.CStr (), pos, str.Length ());
 }
 
 unsigned String::RFind (const String& str, unsigned pos, unsigned n) const
 {
-    logAssert (str.Length () >= n);
-    return RFind_Impl (str.CStr (), pos, n);
+    return RFind (str.CStr (), pos, n);
 }
 
 unsigned String::RFind (const char* s, unsigned pos, unsigned n) const
 {
-    logAssert (StrlenSafe (s) >= n);
-    return RFind_Impl (s, pos, n);
-}
+    if (pos == Npos) return Npos;
+    logAssert (pos < Length ());
 
-unsigned String::RFind_Impl (const char* s, unsigned pos, unsigned n) const
-{
-    if (n == 0) return pos;
+    n = Min (n, StrlenSafe (s));
 
-    ConstReverseIterator it = FindSubset (CRBegin () + pos, CREnd (), ConstReverseIterator (s + n - 1), ConstReverseIterator (s - 1));
+    ConstReverseIterator it = FindSubset (CRBegin () + pos,
+            CREnd (),
+            ConstReverseIterator (s + n - 1),
+            ConstReverseIterator (s - 1));
+
+    // NOTE: we are not calling Position (it) as we have reversed the search
+    // and must revert back.
     return it == CREnd () ? Npos : Distance (it, CREnd ()) - n;
 }
 
 unsigned String::FindFirstOf (const char* s, unsigned pos) const
 {
     return FindFirstOf (s, pos, 1);
-}
-
-unsigned String::FindFirstOf (const char* s, unsigned pos, unsigned n) const
-{
-    bool allowed[256] = {0};
-    for (unsigned i = 0; s[i]; ++i)
-    {
-        unsigned idx = s[i] + 128;
-        allowed[idx] = 1;
-    }
-
-    ConstIterator it = SearchString (CBegin () + pos, CEnd (), n, allowed);
-    return Position (it);
 }
 
 unsigned String::FindFirstOf (char c, unsigned pos) const
@@ -323,26 +355,22 @@ unsigned String::FindFirstOf (char c, unsigned pos) const
 
 unsigned String::FindFirstOf (char c, unsigned pos, unsigned n) const
 {
-    ConstIterator it = FindN (CBegin () + pos, CEnd (), n, c);
+    char s[] = {c};
+    return FindFirstOf (s, pos, n);
+}
+
+unsigned String::FindFirstOf (const char* s, unsigned pos, unsigned n) const
+{
+    if (pos == Npos) return Npos;
+    logAssert (pos < Length ());
+
+    ConstIterator it = SearchStringForAny (CBegin () + pos, CEnd (), n, s);
     return Position (it);
 }
 
 unsigned String::FindLastOf (const char* s, unsigned pos) const
 {
     return FindLastOf (s, pos, 1);
-}
-
-unsigned String::FindLastOf (const char* s, unsigned pos, unsigned n) const
-{
-    bool allowed[256] = {0};
-    for (unsigned i = 0; s[i]; ++i)
-    {
-        unsigned idx = s[i] + 128;
-        allowed[idx] = 1;
-    }
-
-    ConstReverseIterator it = SearchString (CRBegin () + pos, CREnd (), n, allowed);
-    return Position (it);
 }
 
 unsigned String::FindLastOf (char c, unsigned pos) const
@@ -352,28 +380,22 @@ unsigned String::FindLastOf (char c, unsigned pos) const
 
 unsigned String::FindLastOf (char c, unsigned pos, unsigned n) const
 {
-    ConstReverseIterator it = FindN (CRBegin () + pos, CREnd (), n, c);
+    char s[] = {c};
+    return FindLastOf (s, pos, n);
+}
+
+unsigned String::FindLastOf (const char* s, unsigned pos, unsigned n) const
+{
+    if (pos == Npos) return Npos;
+    logAssert (pos < Length ());
+
+    ConstReverseIterator it = SearchStringForAny (CRBegin () + pos, CREnd (), n, s);
     return Position (it);
 }
 
 unsigned String::FindFirstNotOf (const char* s, unsigned pos) const
 {
     return FindFirstNotOf (s, pos, 1);
-}
-
-unsigned String::FindFirstNotOf (const char* s, unsigned pos, unsigned n) const
-{
-    bool allowed[256];
-    Fill (RandomAccessIterator<bool> (allowed), true, 256);
-
-    for (unsigned i = 0; s[i]; ++i)
-    {
-        unsigned idx = s[i] + 128;
-        allowed[idx] = 0;
-    }
-
-    ConstIterator it = SearchString (CBegin () + pos, CEnd (), n, allowed);
-    return Position (it);
 }
 
 unsigned String::FindFirstNotOf (char c, unsigned pos) const
@@ -383,33 +405,22 @@ unsigned String::FindFirstNotOf (char c, unsigned pos) const
 
 unsigned String::FindFirstNotOf (char c, unsigned pos, unsigned n) const
 {
-    auto pred = [](char range_c, char c)
-    {
-        return range_c != c;
-    };
+    char s[] = {c};
+    return FindFirstNotOf (s, pos, n);
+}
 
-    ConstIterator it = FindN (CBegin () + pos, CEnd (), n, c, pred);
+unsigned String::FindFirstNotOf (const char* s, unsigned pos, unsigned n) const
+{
+    if (pos == Npos) return Npos;
+    logAssert (pos < Length ());
+
+    ConstIterator it = SearchStringForNone (CBegin () + pos, CEnd (), n, s);
     return Position (it);
 }
 
 unsigned String::FindLastNotOf (const char* s, unsigned pos) const
 {
     return FindLastNotOf (s, pos, 1);
-}
-
-unsigned String::FindLastNotOf (const char* s, unsigned pos, unsigned n) const
-{
-    bool allowed[256];
-    Fill (RandomAccessIterator<bool> (allowed), true, 256);
-
-    for (unsigned i = 0; s[i]; ++i)
-    {
-        unsigned idx = s[i] + 128;
-       allowed[idx] = 0;
-    }
-
-    ConstReverseIterator it = SearchString (CRBegin () + pos, CREnd (), n, allowed);
-    return Position (it);
 }
 
 unsigned String::FindLastNotOf (char c, unsigned pos) const
@@ -419,46 +430,46 @@ unsigned String::FindLastNotOf (char c, unsigned pos) const
 
 unsigned String::FindLastNotOf (char c, unsigned pos, unsigned n) const
 {
-    auto pred = [](char range_c, char c)
-    {
-        return range_c != c;
-    };
-
-    ConstReverseIterator it = FindN (CRBegin () + pos, CREnd (), n, c, pred);
-    return Position (it);
+    char s[] = {c};
+    return FindLastNotOf (s, pos, n);
 }
 
-int String::Compare (const char* s, unsigned pos, unsigned n) const
+unsigned String::FindLastNotOf (const char* s, unsigned pos, unsigned n) const
 {
-    logAssert (StrlenSafe (s) >= n);
-    return Compare_Impl (s, pos, n);
+    if (pos == Npos) return Npos;
+    logAssert (pos < Length ());
+
+    ConstReverseIterator it = SearchStringForNone (CRBegin () + pos, CREnd (), n, s);
+    return Position (it);
 }
 
 int String::Compare (const String& str, unsigned pos, unsigned n) const
 {
-    logAssert (str.Length () >= n);
     return Compare (str.CStr (), pos, n);
 }
 
 int String::Compare (const char* s, unsigned pos) const
 {
-    return Compare_Impl (s, pos, StrlenSafe (s));
+    return Compare (s, pos, StrlenSafe (s));
 }
 
 int String::Compare (const String& str, unsigned pos) const
 {
-    return Compare_Impl (str.CStr (), pos, str.Length ());
+    return Compare (str.CStr (), pos, str.Length ());
 }
 
-int String::Compare_Impl (const char* s, unsigned pos, unsigned n) const
+int String::Compare (const char* s, unsigned pos, unsigned n) const
 {
-    unsigned this_length = Length () - pos;
-    unsigned s_length = n;
+    if (pos == Npos) return StrlenSafe (s) ? -1 : 0;
+    logAssert (pos < Length ());
 
-    if (this_length == s_length)
+    unsigned this_length = Length () - pos;
+    unsigned other_length = n;
+
+    if (this_length == other_length)
         return strncmp (CStr () + pos, s, n);
 
-    return this_length > s_length ? 1 : -1;
+    return this_length > other_length ? 1 : -1;
 }
 
 unsigned String::Position (ConstIterator it) const
@@ -516,24 +527,31 @@ bool Cellwars::operator>= (const String& str1, const String& str2)
     return !Cellwars::operator< (str2, str1);
 }
 
+unsigned String::Npos = MaxSize ();
+
+unsigned String::MaxSize ()
+{
+    return Vector<char>::MaxSize () - 1;
+}
+
 std::istream& Cellwars::Get (std::istream& istr, String& str, char delim)
 {
-    str.Clear ();
-
-    constexpr unsigned DEFAULT_SIZE = 128;
-    unsigned try_resize = DEFAULT_SIZE;
+    constexpr unsigned DEFAULT_RESIZE_AMOUNT = 128;
+    unsigned resize_amount = DEFAULT_RESIZE_AMOUNT;
     unsigned cnt = 0;
+
+    str.Clear ();
 
     while (istr && str.Size () != str.MaxSize ())
     {
-        str.RelativeResize (try_resize);
+        str.ClosestRelativeResize (resize_amount);
 
         unsigned remaining = str.Size () - cnt;
         istr.get (str.Str () + cnt, remaining, delim);
         cnt += istr.gcount ();
 
         if (istr.peek () == delim) break;
-        try_resize = cnt;
+        resize_amount = cnt;
     }
 
     str.Resize (cnt);
@@ -563,3 +581,4 @@ String Cellwars::operator+ (const String& str1, const String& str2)
 
     return res;
 }
+

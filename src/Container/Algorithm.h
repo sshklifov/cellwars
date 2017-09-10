@@ -1,8 +1,18 @@
 #ifndef ALGORITHM_INCLUDED
 #define ALGORITHM_INCLUDED
 
-#include "Iterator.h"
+#include "IteratorTag.h"
 #include <utility>
+
+/*! @file Algorithm.h
+ *
+ *  Basic algorithm functions.
+ *  Every container is an abstraction that stores data in a specific way.
+ *  Iterators are the in-between class help 'iterate' this data. This file
+ *  only implements the most basic algorithms, using exactly iterators. This
+ *  means that any of the functions can be used on any data type, provided
+ *  that they implement their own iterators and that their type is appropriate.
+ */
 
 #define ALGO_CHECK(x,y)                                                         \
         static_assert (std::is_base_of<y, typename x::Category>::value, "Invalid iterator type")

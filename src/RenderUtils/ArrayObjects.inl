@@ -1,5 +1,6 @@
 #include "ArrayObjects.h"
 #include <Container/Algorithm.h>
+#include <Container/Iterator.h>
 
 template <unsigned N>
 Cellwars::BufferObject<N>::BufferObject () : objs {0}

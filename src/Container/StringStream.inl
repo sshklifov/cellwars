@@ -14,12 +14,15 @@ int Cellwars::InputStringStream::ScanFmt (const char* fmt, Args... args)
     new_fmt += "%n";
 
     int pos = -1;
-    int retval = ScanFmt_Impl (new_fmt.CStr (), args..., &pos);
+    int retval = ScanFmtWrap (new_fmt.CStr (), args..., &pos);
 
-    if (retval == EOF || ((unsigned)retval != sizeof... (args)))
+    if (retval == EOF)
     {
-        SetStates (errno == EILSEQ ? StringStreamState::PARTIAL_WR | StringStreamState::ENCODING_ERR : StringStreamState::PARTIAL_WR);
-        return 0;
+        SetStates (StringStreamState::BAD);
+    }
+    else if ((unsigned)retval != sizeof... (args))
+    {
+        SetStates (StringStreamState::FAIL);
     }
 
     offset += pos;
@@ -27,9 +30,9 @@ int Cellwars::InputStringStream::ScanFmt (const char* fmt, Args... args)
 }
 
 template <typename... Args>
-int Cellwars::InputStringStream::ScanFmt_Impl (const char* fmt, Args... args)
+int Cellwars::InputStringStream::ScanFmtWrap (const char* fmt, Args... args)
 {
-    return sscanf (p.GetCPtr () + offset, fmt, args...);
+    return sscanf (&str[offset], fmt, args...);
 }
 
 template <typename... Args>
@@ -37,35 +40,42 @@ int Cellwars::OutputStringStream::PrintFmt (const char* fmt, Args... args)
 {
     if (!Good ()) return 0;
 
-    constexpr unsigned DEFAULT_SIZE = 128;
+    constexpr unsigned DEFAULT_RESIZE_AMOUNT = 128;
+    int num_written = TryPrintFmt (DEFAULT_RESIZE_AMOUNT, fmt, args...);
 
-    unsigned try_resize = DEFAULT_SIZE;
-    unsigned original_size = str.Size ();
-    int num_read;
-
-    while (str.Size () != str.MaxSize ())
+    bool try_again = num_written >= (int)DEFAULT_RESIZE_AMOUNT;
+    if (try_again)
     {
-        str.RelativeResize (try_resize);
-
-        char* buf = str.Str () + original_size;
-        unsigned buf_size = str.Size () - original_size;
-        num_read = snprintf (buf, buf_size, fmt, args...);
-
-        if (num_read < 0)
-        {
-            SetStates (StringStreamState::ENCODING_ERR);
-            num_read = 0;
-            break;
-        }
-        if ((unsigned)num_read < buf_size)
-        {
-            break;
-        }
-
-        int suggested_resize = num_read - buf_size;
-        try_resize = Max ((int)DEFAULT_SIZE, suggested_resize);
+        int sufficiently_large = num_written + 1;
+        num_written = TryPrintFmt (sufficiently_large, fmt, args...);
+        logAssert (num_written > 0 && num_written < sufficiently_large);
     }
 
-    str.Resize (original_size + num_read);
-    return num_read;
+    return num_written;
+
+}
+
+template <typename... Args>
+int Cellwars::OutputStringStream::TryPrintFmt (unsigned resize_amount, const char* fmt, Args... args)
+{
+    unsigned old_size = str.Size ();
+    str.RelativeResize (resize_amount);
+
+    int num_written = snprintf (&str[old_size], resize_amount, fmt, args...);
+
+    bool failed = num_written < 0 || ((unsigned)num_written >= resize_amount);
+    if (failed)
+    {
+        if (num_written < 0)
+        {
+            SetStates (StringStreamState::FAIL);
+        }
+        str.Resize (old_size);
+    }
+    else
+    {
+        str.Resize (old_size + num_written);
+    }
+
+    return num_written;
 }

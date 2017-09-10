@@ -1,19 +1,18 @@
 #include "StringStream.h"
+#include <cstring>
 
 using Cellwars::StringStreamState;
 using Cellwars::InputStringStream;
 
-InputStringStream::InputStringStream (const char* s) : InputStringStream (s, StrlenSafe (s))
+InputStringStream::InputStringStream (String str) : str (std::move (str)), offset (0)
 {
 }
 
-InputStringStream::InputStringStream (const char* s, unsigned n) : p (new char[n + 1]), offset (0)
+InputStringStream::InputStringStream (const char* s) : str (s), offset (0)
 {
-    Copy (ForwardIterator<const char> (s), ForwardIterator<const char> (s + n), ForwardIterator<char> (p.GetPtr ()));
-    p[n] = '\0';
 }
 
-InputStringStream::InputStringStream (const String& str) : InputStringStream (str.CStr (), str.Size ())
+InputStringStream::InputStringStream (const char* s, unsigned n) : str (s, n), offset (0)
 {
 }
 

@@ -47,8 +47,11 @@ bool HieroContentsCharWatcher::Catch (const HieroContentsEvent::Type& e, HieroCo
 
     if (name != "char") return false;
 
+    // MAJOR TODO
     ctx.v_glyphs.RelativeResize (1);
-    Cellwars::CatchTokensForEvent<Cellwars::HieroGlyphEvent> (e.Substr (pos), ctx.v_glyphs.Front ());
+
+    //TODO Cellwars::CatchTokensForEvent<Cellwars::HieroGlyphEvent> (e.Substr (pos), ctx.v_glyphs.Front ());
+    Cellwars::CatchTokensForEvent<Cellwars::HieroGlyphEvent> (e.Substr (pos), ctx.v_glyphs.Back ());
 
     return true;
 }

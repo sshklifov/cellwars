@@ -1,21 +1,15 @@
 #ifndef ITERATOR_INCLUDED
 #define ITERATOR_INCLUDED
 
+#include "IteratorTag.h"
 #include <cstddef>
+
+/*! @file Iterator.h
+ *
+ *  Declares 
 
 namespace Cellwars
 {
-    struct ForwardIteratorTag
-    {
-    };
-
-    struct BidirectionalIteratorTag : ForwardIteratorTag
-    {
-    };
-
-    struct RandomAccessIteratorTag : BidirectionalIteratorTag
-    {
-    };
 
     template <typename T>
     class ForwardIterator

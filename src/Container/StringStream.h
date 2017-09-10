@@ -10,7 +10,7 @@ namespace Cellwars
     {
     public:
         using ValueType = unsigned short;
-        enum {GOOD = 0, ENCODING_ERR = 1, PARTIAL_WR = 2};
+        enum {GOOD = 0, FAIL = 1, BAD = 2};
 
     public:
         void SetStates (ValueType new_states);
@@ -25,9 +25,9 @@ namespace Cellwars
     class InputStringStream
     {
     public:
+        explicit InputStringStream (String str);
         explicit InputStringStream (const char* s);
         explicit InputStringStream (const char* s, unsigned n);
-        explicit InputStringStream (const String& str);
 
         InputStringStream () = delete;
         InputStringStream (const InputStringStream&) = delete;
@@ -59,10 +59,10 @@ namespace Cellwars
 
     private:
         template <typename... Args>
-        int ScanFmt_Impl (const char* fmt, Args... args);
+        int ScanFmtWrap (const char* fmt, Args... args);
 
     private:
-        NewPtr<char> p;
+        String str;
         unsigned offset;
 
         StringStreamState state;
@@ -126,6 +126,10 @@ namespace Cellwars
         OutputStringStream& operator<< (double);
 
         OutputStringStream& operator<< (bool);
+
+    private:
+        template <typename... Args>
+        int TryPrintFmt (unsigned resize_amount, const char* fmt, Args... args);
 
     private:
         String str;

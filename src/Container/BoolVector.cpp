@@ -11,7 +11,6 @@ using ReverseIterator = BoolVector::ReverseIterator;
 using ConstReverseIterator = BoolVector::ConstReverseIterator;
 
 using Proxy = BoolVector::Proxy;
-using ConstProxy = BoolVector::ConstProxy;
 
 constexpr unsigned BoolVector::Mask;
 constexpr unsigned BoolVector::Shift;
@@ -36,17 +35,19 @@ BoolVector::BoolVector () : bits (0)
 {
 }
 
-BoolVector::BoolVector (std::initializer_list<bool> l)
+BoolVector::BoolVector (std::initializer_list<bool> l) : BoolVector ()
 {
     logAssert (l.size () <= MaxSize ());
 
     Resize (l.size ());
-    Copy (ReverseForwardIterator<const bool> (l.end () - 1), ReverseForwardIterator<const bool> (l.begin () - 1), Begin ());
+    Copy (ReverseForwardIterator<const bool> (l.end () - 1),
+            ReverseForwardIterator<const bool> (l.begin () - 1),
+            Begin ());
 }
 
-BoolVector::BoolVector (unsigned req_size)
+BoolVector::BoolVector (unsigned req_size) : BoolVector ()
 {
-    Reserve (req_size);
+    Resize (req_size);
 }
 
 constexpr unsigned BoolVector::MaxSize ()
@@ -66,25 +67,19 @@ unsigned BoolVector::Size () const
     return bits;
 }
 
-unsigned BoolVector::Buckets () const
-{
-    return v.Size ();
-}
-
 void BoolVector::PushBack (bool val)
 {
     logAssert (MaxSize () - 1 >= Size ());
 
-    Resize (Size () + 1);
-    Front () = val;
+    RelativeResize (1);
+    Back () = val;
 }
 
 void BoolVector::PushBack (bool val, unsigned n)
 {
     logAssert (MaxSize () - n >= Size ());
 
-
-    Resize (Size () + n);
+    RelativeResize (n);
     Fill (RBegin (), val, n);
 }
 
@@ -96,8 +91,22 @@ void BoolVector::Resize (unsigned req_bits)
 
 void BoolVector::RelativeResize (unsigned req_bits)
 {
-    unsigned total_bits = (MaxSize () - req_bits) < Size () ? MaxSize () : Size () + req_bits;
-    Resize (total_bits);
+    logAssert (req_bits <= MaxSize () - Size ());
+    Resize (req_bits);
+}
+
+void BoolVector::ClosestRelativeResize (unsigned req_bits)
+{
+    logAssert (Size () != MaxSize () || req_bits != 0);
+
+    if (MaxSize () - req_bits < Size ())
+    {
+        Resize (MaxSize ());
+    }
+    else
+    {
+        Resize (Size () + req_bits);
+    }
 }
 
 void BoolVector::ShrinkToFit ()
@@ -129,10 +138,7 @@ Iterator BoolVector::Begin ()
 
 Iterator BoolVector::End ()
 {
-    Iterator res = Begin ();
-    res += bits;
-
-    return res;
+    return Iterator (v.Data (), Size ());
 }
 
 ConstIterator BoolVector::CBegin () const
@@ -142,66 +148,45 @@ ConstIterator BoolVector::CBegin () const
 
 ConstIterator BoolVector::CEnd () const
 {
-    ConstIterator res = CBegin ();
-    res += bits;
-
-    return res;
-}
-
-ReverseIterator BoolVector::REnd ()
-{
-    ReverseIterator res (v.Data (), 0);
-    return ++res;
+    return ConstIterator (v.Data (), Size ());
 }
 
 ReverseIterator BoolVector::RBegin ()
 {
-    ReverseIterator res = REnd ();
-    res -= bits;
-
-    return res;
+    return ReverseIterator (v.Data (), Size () - 1);
 }
 
-ConstReverseIterator BoolVector::CREnd () const
+ReverseIterator BoolVector::REnd ()
 {
-    ConstReverseIterator res (v.Data (), 0);
-    return ++res;
+    return ReverseIterator (v.Data (), -1);
 }
 
 ConstReverseIterator BoolVector::CRBegin () const
 {
-    ConstReverseIterator res = CREnd ();
-    res -= bits;
-
-    return res;
+    return ConstReverseIterator (v.Data (), Size () - 1);
 }
 
-const BoolVector::ValueType* BoolVector::Data () const
+ConstReverseIterator BoolVector::CREnd () const
 {
-    return v.Data ();
-}
-
-BoolVector::ValueType* BoolVector::Data ()
-{
-    return v.Data ();
-}
-
-bool BoolVector::Front () const
-{
-    return *CRBegin ();
-}
-
-Proxy BoolVector::Front ()
-{
-    return *RBegin ();
+    return ConstReverseIterator (v.Data (), -1);
 }
 
 bool BoolVector::Back () const
 {
-    return *CBegin ();
+    return *CRBegin ();
 }
 
 Proxy BoolVector::Back ()
+{
+    return *RBegin ();
+}
+
+bool BoolVector::Front () const
+{
+    return *CBegin ();
+}
+
+Proxy BoolVector::Front ()
 {
     return *Begin ();
 }
@@ -235,20 +220,19 @@ void BoolVector::Flip (unsigned idx)
 Proxy BoolVector::operator[] (unsigned idx)
 {
     logAssert (idx < Size ());
-
-    return Proxy (v.Data () + (idx >> Shift), idx & Mask);
+    return Begin ()[idx];
 }
 
 bool BoolVector::operator[] (unsigned idx) const
 {
     logAssert (idx < Size ());
-
-    ValueType bucket = *(v.Data () + (idx >> Shift));
-    return bucket & (1 << (idx & Mask));
+    return CBegin ()[idx];
 }
 
-Proxy::Proxy (BoolVector::ValueType* p, unsigned offset) : p (p), offset (offset)
+Proxy::Proxy (BoolVector::ValueType* p, unsigned offset)
 {
+    this->p = p + (offset >> BoolVector::Shift);
+    this->offset = offset & BoolVector::Mask;
 }
 
 Proxy& Proxy::operator= (bool val)
@@ -288,19 +272,6 @@ Proxy& Proxy::operator|= (bool val)
 }
 
 Proxy::operator bool () const
-{
-    return *p & (BoolVector::ValueType (1) << offset);
-}
-
-ConstProxy::ConstProxy (const BoolVector::ValueType* p, unsigned offset) : p (p), offset (offset)
-{
-}
-
-ConstProxy::ConstProxy (const Proxy& proxy) : p (proxy.p), offset (proxy.offset)
-{
-}
-
-ConstProxy::operator bool () const
 {
     return *p & (BoolVector::ValueType (1) << offset);
 }

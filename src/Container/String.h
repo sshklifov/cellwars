@@ -18,7 +18,8 @@ namespace Cellwars
         using ConstReverseIterator = Vector<char>::ConstReverseIterator;
 
     public:
-        String () = default;
+        String ();
+        explicit String (std::nullptr_t);
         explicit String (unsigned n);
         explicit String (const char* s);
         explicit String (const char* s, unsigned n);
@@ -35,6 +36,7 @@ namespace Cellwars
         void Reserve (unsigned req_size);
         void Resize (unsigned req_size);
         void RelativeResize (unsigned req_size);
+        void ClosestRelativeResize (unsigned req_size);
         void ShrinkToFit ();
         void Clear ();
         void Swap (String& rhs);
@@ -110,17 +112,12 @@ namespace Cellwars
         int Compare (const String& str, unsigned pos, unsigned n) const;
 
     private:
-        unsigned Find_Impl (const char* s, unsigned pos, unsigned n) const;
-        unsigned RFind_Impl (const char* s, unsigned pos, unsigned n) const;
-        int Compare_Impl (const char* s, unsigned pos, unsigned n) const;
-
         unsigned Position (ConstIterator it) const;
         unsigned Position (ConstReverseIterator it) const;
-
-        void NullTerminate () const;
+        void AppendNull () const;
 
     private:
-        mutable Vector<char> v;
+        Vector<char> v;
 
     public:
         static unsigned Npos;

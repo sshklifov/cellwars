@@ -6,7 +6,7 @@ Cellwars::BoolVectorIterator<T>::BoolVectorIterator () : p (NULL), offset (0)
 }
 
 template <typename T>
-Cellwars::BoolVectorIterator<T>::BoolVectorIterator (T* p, unsigned offset) : p (p), offset (offset)
+Cellwars::BoolVectorIterator<T>::BoolVectorIterator (T* p, DifferenceType offset) : p (p), offset (offset)
 {
 }
 
@@ -25,17 +25,20 @@ bool Cellwars::BoolVectorIterator<T>::operator!= (const Cellwars::BoolVectorIter
 template <typename T>
 typename Cellwars::BoolVectorIterator<T>::ConstReference Cellwars::BoolVectorIterator<T>::operator* () const
 {
-    return ProxyType (p, offset);
+    logAssert (offset >= 0);
+    return BoolVector::Proxy (const_cast<typename std::remove_const<T>::type*> (p), offset);
 }
 
 template <typename T>
 typename Cellwars::BoolVectorIterator<T>::Reference Cellwars::BoolVectorIterator<T>::operator* ()
 {
-    return ProxyType (p, offset);
+    logAssert (offset >= 0);
+    return BoolVector::Proxy (const_cast<typename std::remove_const<T>::type*> (p), offset);
 }
 
 template <typename T>
-typename Cellwars::BoolVectorIterator<T>::ConstReference Cellwars::BoolVectorIterator<T>::operator[] (unsigned idx) const
+typename Cellwars::BoolVectorIterator<T>::ConstReference
+Cellwars::BoolVectorIterator<T>::operator[] (unsigned idx) const
 {
     return *((*this) + idx);
 }
@@ -80,28 +83,13 @@ template <typename T>
 Cellwars::BoolVectorIterator<T>& Cellwars::BoolVectorIterator<T>::operator+= (unsigned n)
 {
     offset += n;
-    p += (offset >> BoolVector::Shift);
-    offset &= BoolVector::Mask;
-
     return (*this);
 }
 
 template <typename T>
 Cellwars::BoolVectorIterator<T>& Cellwars::BoolVectorIterator<T>::operator-= (unsigned n)
 {
-    p -= (n >> BoolVector::Shift);
-    n &= BoolVector::Mask;
-
-    if (n > offset)
-    {
-        --p;
-        offset += BoolVector::Bits - n;
-    }
-    else
-    {
-        offset -= n;
-    }
-
+    offset -= n;
     return (*this);
 }
 
@@ -124,19 +112,18 @@ Cellwars::BoolVectorIterator<T> Cellwars::BoolVectorIterator<T>::operator- (unsi
 }
 
 template <typename T>
-typename Cellwars::BoolVectorIterator<T>::DifferenceType Cellwars::BoolVectorIterator<T>::operator- (const Cellwars::BoolVectorIterator<T>& rhs) const
+typename Cellwars::BoolVectorIterator<T>::DifferenceType
+Cellwars::BoolVectorIterator<T>::operator- (const Cellwars::BoolVectorIterator<T>& rhs) const
 {
-    DifferenceType res = (p - rhs.p) >> BoolVector::Shift;
-    res += offset;
-    res -= rhs.offset;
-
-    return res;
+    logAssert (p == rhs.p);
+    return offset - rhs.offset;
 }
 
 template <typename T>
 bool Cellwars::BoolVectorIterator<T>::operator< (const Cellwars::BoolVectorIterator<T>& rhs) const
 {
-    return p < rhs.p || (p == rhs.p && offset < rhs.offset);
+    logAssert (p == rhs.p);
+    return offset < rhs.offset;
 }
 
 template <typename T>
