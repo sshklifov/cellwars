@@ -51,6 +51,13 @@ namespace Cellwars
         void CoherentUpdate ();
 
     private:
+        void UpdateScaleIfSet (float* buf);
+        void UpdateProjectionIfSet (float* buf);
+        void UpdateTranslateIfSet (float* buf);
+        void UpdateMvpIfSet (float* buf);
+        void UpdateMatrixIfSet (int matrix, void* buf, void* data);
+
+    private:
         GLuint ubo;
         glm::mat4 projection;
         glm::mat4 scale;

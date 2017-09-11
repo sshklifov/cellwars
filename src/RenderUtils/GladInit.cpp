@@ -10,11 +10,8 @@ using Singleton = Cellwars::GladInit::Singleton;
 
 static void ApplicationSpecificGLCalls ()
 {
+    glViewport (0, 0, GlfwInit::GetInstance().GetWidth (), GlfwInit::GetInstance().GetHeight ());
     glDisable (GL_CULL_FACE);
-    /* glEnable (GL_DEPTH_TEST); */
-    /* glDepthFunc (GL_LESS); */
-    /* glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); */
-    /* glEnable (GL_BLEND); */
     glLineWidth (1.3f);
 }
 
@@ -33,7 +30,6 @@ Singleton::Singleton ()
         throw std::runtime_error ("glad failed to load OpenGL library");
     }
 
-    glViewport (0, 0, GlfwInit::GetInstance().GetWidth (), GlfwInit::GetInstance().GetHeight ());
     ApplicationSpecificGLCalls ();
 
     logDebug ("using OpenGL version %d.%d", GLVersion.major, GLVersion.minor);

@@ -4,6 +4,7 @@
 #include <glad/glad.h>
 #include <Container/StringStream.h>
 #include <Container/String.h>
+#include <Container/Vector.h>
 
 #include <cstring>
 #include <stdexcept>
@@ -76,6 +77,35 @@ Program::operator GLuint () const
     return id;
 }
 
+void Program::LoadImpl (const char* name, const char* shaders)
+{
+    id = glCreateProgram ();
+    Vector<GLuint> shader_storage;
+
+    try
+    {
+        LoadShaders (shader_storage, name, shaders);
+        AttachShadersAndLink (shader_storage, id);
+    }
+    catch (std::exception& e)
+    {
+        DetachShaders (id, shader_storage);
+
+        OutputStringStream ss;
+        ss << "failed to create program \'" << name << "\':" << e.what ();
+        throw std::runtime_error (ss.CStr ());
+    }
+
+    DetachShaders (id, shader_storage);
+}
+
+static Vector<GLuint> LoadShaders (Vector<GLuit>& storage, const char* name, const char* shaders)
+{
+    for (unsigned idx = 0; shaders[idx]; ++idx)
+    {
+        storage.PushBack (ParseShader (name, shaders[idx]));
+    }
+}
 
 static Shader ParseShader (const char* name, char ext)
 {
@@ -111,7 +141,20 @@ static Shader ParseShader (const char* name, char ext)
     return Shader (ss.CStr (), type);
 }
 
-static void VerifyProgramLinked (GLuint program)
+static AttachShadersAndLink (GLuint program, Vector<GLuint>& shaders)
+{
+    for (unsigned i = 0; i < shaders.Size (); ++i)
+    {
+        glAttachShader (program, shaders[i]);
+    }
+
+    glLinkProgram (program);
+#ifndef NDEBUG
+    ThrowIfProgramLinkFailed (program);
+#endif
+}
+
+static void ThrowIfProgramLinkFailed (GLuint program)
 {
     GLint success;
     glGetProgramiv (program, GL_LINK_STATUS, &success);
@@ -133,41 +176,10 @@ static void VerifyProgramLinked (GLuint program)
     }
 }
 
-void Program::Load_Impl (const char* name, const char* shaders)
+static void DetachShaders (GLuint program, Vector<GLuint>& shaders)
 {
-    id = glCreateProgram ();
-
-    constexpr unsigned MAX_SHADERS = 5;
-    Shader s[MAX_SHADERS];
-    unsigned idx;
-
-    try
+    for (unsigned idx = 0; idx < shaders.Size (); ++i)
     {
-        for (idx = 0; shaders[idx] != '\0'; ++idx)
-        {
-            s[idx] = ParseShader (name, shaders[idx]);
-            glAttachShader (id, s[idx]);
-        }
-
-        glLinkProgram (id);
-        VerifyProgramLinked (id);
-    }
-    catch (std::exception& e)
-    {
-        for (unsigned i = 0; i < idx; ++i)
-        {
-            glDetachShader (id, s[i]);
-            s[i].Clear ();
-        }
-
-        OutputStringStream ss;
-        ss << "failed to create program \'" << name << "\':" << e.what ();
-
-        throw std::runtime_error (ss.CStr ());
-    }
-
-    for (unsigned i = 0; shaders[i] != '\0'; ++i)
-    {
-        glDetachShader (id, s[i]);
+        glDetachShader (program, shaders[i]);
     }
 }

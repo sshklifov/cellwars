@@ -9,6 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <cstring>
+
 using Cellwars::Matrices;
 using Singleton = Matrices::Singleton;
 
@@ -24,7 +26,6 @@ Singleton& Matrices::GetInstance ()
     return instance;
 }
 
-#include <cstring>
 void Matrices::RegisterProgram (GLuint prog)
 {
     logAssert (GetInstance().IsLoaded ());
@@ -101,31 +102,46 @@ void Singleton::CoherentUpdate ()
     glBindBufferBase (GL_UNIFORM_BUFFER, Matrices::binding_point, ubo);
     float* buf = (float*)glMapBuffer (GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
 
-    if (update_bitfield & SCALE)
-    {
-        constexpr unsigned offset = 0;
-        memcpy (buf + offset, glm::value_ptr (scale), matrix_sizeof);
-    }
-    if (update_bitfield & PROJECTION)
-    {
-        constexpr unsigned offset = 16;
-        memcpy (buf + offset, glm::value_ptr (projection), matrix_sizeof);
-    }
-    if (update_bitfield & TRANSLATE)
-    {
-        constexpr unsigned offset = 32;
-        memcpy (buf + offset, glm::value_ptr (translate), matrix_sizeof);
-    }
-    if (update_bitfield & MVP)
-    {
-        glm::mat4 mvp = GetScaleMatrix () * GetProjectionMatrix () * GetTranslateMatrix ();
-
-        constexpr unsigned offset = 48;
-        memcpy (buf + offset, glm::value_ptr (mvp), matrix_sizeof);
-    }
+    UpdateScaleIfSet (buf);
+    UpdateProjectionIfSet (buf);
+    UpdateTranslateIfSet (buf);
+    UpdateMvpIfSet (buf);
 
     glUnmapBuffer (GL_UNIFORM_BUFFER);
     update_bitfield = 0;
+}
+
+void Singleton::UpdateScaleIfSet (float* buf)
+{
+    constexpr unsigned offset = 0;
+    UpdateMatrixIfSet (SCALE, buf + offset, glm::value_ptr (scale));
+}
+
+void Singleton::UpdateProjectionIfSet (float* buf)
+{
+    constexpr unsigned offset = 16;
+    UpdateMatrixIfSet (PROJECTION, buf + offset, glm::value_ptr (projection));
+}
+
+void Singleton::UpdateTranslateIfSet (float* buf)
+{
+    constexpr unsigned offset = 32;
+    UpdateMatrixIfSet (TRANSLATE, buf + offset, glm::value_ptr (translate));
+}
+
+void Singleton::UpdateMvpIfSet (float* buf)
+{
+    constexpr unsigned offset = 48;
+    glm::mat4 mvp = GetScaleMatrix () * GetProjectionMatrix () * GetTranslateMatrix ();
+    UpdateMatrixIfSet (MVP, buf + offset, glm::value_ptr (mvp));
+}
+
+void Singleton::UpdateMatrixIfSet (int matrix, void* buf, void* data)
+{
+    if (update_bitfield & matrix)
+    {
+        memcpy (buf, data, matrix_sizeof);
+    }
 }
 
 bool Singleton::IsLoaded () const

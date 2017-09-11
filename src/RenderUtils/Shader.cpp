@@ -64,16 +64,32 @@ void Shader::Load (const char* file, GLenum type)
 {
     try
     {
-        Load_Impl (file, type);
+        id = CreateShader (file, type);
     }
-    catch (...)
+    catch (std::exception& e)
     {
-        Clear ();
-        throw;
+        OutputStringStream ss;
+        ss << "Failed to create shader \"" << file << "\": " << e.what();
+        throw std::runtime_error (ss.CStr ());
     }
 }
 
-static void VerifyShaderCompiled (GLuint shader)
+static GLuint CreateShader (const char* file, GLenum type)
+{
+    NewPtr<char> buf = SourceFile (file);
+    GLchar* strings[1] = {buf.GetPtr ()};
+
+    GLuint id = glCreateShader (type);
+    glShaderSource (id, 1, strings, NULL);
+    glCompileShader (id);
+#ifndef NDEBUG
+    ThrowIfShaderCompilationFailed (id);
+#endif
+
+    return id;
+}
+
+static void ThrowIfShaderCompilationFailed (GLuint shader)
 {
     GLint success;
     glGetShaderiv (shader, GL_COMPILE_STATUS, &success);
@@ -92,30 +108,4 @@ static void VerifyShaderCompiled (GLuint shader)
         glGetShaderInfoLog (shader, 4096, NULL, buf);
         throw std::runtime_error (buf);
     }
-}
-
-void Shader::Load_Impl (const char* file, GLenum type)
-{
-    logAssert (!IsLoaded ());
-
-    NewPtr<char> buf = SourceFile (file);
-    GLchar* strings[1] = {buf.GetPtr ()};
-
-    id = glCreateShader (type);
-    glShaderSource (id, 1, strings, NULL);
-    glCompileShader (id);
-
-#ifndef NDEBUG
-    try
-    {
-        VerifyShaderCompiled (id);
-    }
-    catch (std::exception& e)
-    {
-        OutputStringStream ss;
-        ss << "Failed to compile shader \'" << file << "\': " << e.what ();
-
-        throw std::runtime_error (ss.CStr ());
-    }
-#endif
 }

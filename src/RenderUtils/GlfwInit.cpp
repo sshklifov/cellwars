@@ -12,12 +12,7 @@ Singleton& GlfwInit::GetInstance ()
     return instance;
 }
 
-static void GlfwErrorCallback (int errcode, const char* str)
-{
-    logWarn ("caught glfw error %d: %s", errcode, str);
-}
-
-Singleton::Singleton ()
+static void InitializeGlfw ()
 {
     if (!glfwInit())
     {
@@ -27,7 +22,15 @@ Singleton::Singleton ()
 #ifndef NDEBUG
     glfwSetErrorCallback (GlfwErrorCallback);
 #endif
+}
 
+static void GlfwErrorCallback (int errcode, const char* str)
+{
+    logWarn ("caught glfw error %d: %s", errcode, str);
+}
+
+static GLFWwindow* CreateFullscreenWindow ()
+{
     GLFWmonitor* monitor = glfwGetPrimaryMonitor ();
     if (monitor == NULL)
     {
@@ -40,6 +43,19 @@ Singleton::Singleton ()
         throw std::runtime_error ("could not get vide mode of primary monitor");
     }
 
+    SetWindowHints (vidmode);
+
+    window = glfwCreateWindow (vidmode->width, vidmode->height, "Cellwars", monitor, NULL);
+    if (window == NULL)
+    {
+        throw std::runtime_error ("could not create a rendering window");
+    }
+
+    return window;
+}
+
+static void SetWindowHints (const GLFWvidmode* vidmode)
+{
     glfwWindowHint (GLFW_RED_BITS, vidmode->redBits);
     glfwWindowHint (GLFW_GREEN_BITS, vidmode->greenBits);
     glfwWindowHint (GLFW_BLUE_BITS, vidmode->blueBits);
@@ -48,19 +64,17 @@ Singleton::Singleton ()
     glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+}
 
-    window = glfwCreateWindow (vidmode->width, vidmode->height, "Cellwars", monitor, NULL);
-    if (window == NULL)
-    {
-        throw std::runtime_error ("could not create a rendering window");
-    }
+Singleton::Singleton ()
+{
+    InitializeGlfw ();
 
+    window = CreateFullscreenWindow ();
     glfwMakeContextCurrent (window);
     glfwSwapInterval (1);
 
-    width = vidmode->width;
-    height = vidmode->height;
-    status = true;
+    glfwGetWindowSize (window, &width, &height);
 }
 
 Singleton::~Singleton ()
@@ -70,16 +84,16 @@ Singleton::~Singleton ()
 
 bool Singleton::IsLoaded () const
 {
-    return status;
+    return window;
 }
 
 void Singleton::Clear ()
 {
-    if (status)
+    if (IsLoaded ())
     {
         glfwDestroyWindow (window);
+        window = NULL;
         glfwTerminate ();
-        status = false;
     }
 }
 

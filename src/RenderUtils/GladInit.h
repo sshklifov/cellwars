@@ -28,4 +28,3 @@ namespace Cellwars
 };
 
 #endif /* GLAD_INIT_INCLUDED */
-
