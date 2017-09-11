@@ -65,7 +65,7 @@ namespace Cellwars
         FVec2 RenderText (FVec2 origin, const char* text) const;
 
     private:
-        void Load_Impl (NewPtr<Builder> p);
+        void LoadImpl (NewPtr<Builder> p);
         void LoadOpenGLSpecifics ();
 
     private:

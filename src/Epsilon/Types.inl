@@ -30,16 +30,16 @@ struct Cellwars::UintWithSize
 };
 
 template <typename T, bool is_floating_point = std::is_floating_point<T>::value>
-struct LengthType_Impl;
+struct _LengthTypeImpl;
 
 template <typename T>
-struct LengthType_Impl<T, false>
+struct _LengthTypeImpl<T, false>
 {
     using type = typename std::make_unsigned<T>::type;
 };
 
 template <typename T>
-struct LengthType_Impl<T, true>
+struct _LengthTypeImpl<T, true>
 {
     using type = T;
 };
@@ -47,5 +47,5 @@ struct LengthType_Impl<T, true>
 template <typename T>
 struct Cellwars::LengthType
 {
-    using type = typename LengthType_Impl<T>::type;
+    using type = typename _LengthTypeImpl<T>::type;
 };

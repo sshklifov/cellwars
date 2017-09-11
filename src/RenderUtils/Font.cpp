@@ -20,7 +20,7 @@ void Font::Load (NewPtr<Builder> p)
 {
     try
     {
-        Load_Impl (p.Release ());
+        LoadImpl (p.Release ());
     }
     catch (...)
     {
@@ -32,7 +32,7 @@ void Font::Load (NewPtr<Builder> p)
     ClearTex ();
 }
 
-void Font::Load_Impl (NewPtr<Builder> p)
+void Font::LoadImpl (NewPtr<Builder> p)
 {
     logAssert (!IsLoaded ());
     logAssert (p->IsLoaded ());

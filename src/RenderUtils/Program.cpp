@@ -52,7 +52,7 @@ void Program::Load (const char* name, const char* shaders)
 {
     try
     {
-        Load_Impl (name, shaders);
+        LoadImpl (name, shaders);
     }
     catch (...)
     {

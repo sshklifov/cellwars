@@ -42,23 +42,23 @@ namespace Cellwars
     template <typename ForwardIt>
     bool IsBefore (ForwardIt lhs, ForwardIt rhs)
     {
-        return IsBefore_Impl (lhs, rhs, typename ForwardIt::Category ());
+        return _IsBeforeImpl (lhs, rhs, typename ForwardIt::Category ());
     }
 
     template <typename ForwardIt>
-    bool IsBefore_Impl (ForwardIt lhs, ForwardIt rhs, ForwardIteratorTag)
+    bool _IsBeforeImpl (ForwardIt lhs, ForwardIt rhs, ForwardIteratorTag)
     {
         return lhs != rhs;
     }
 
     template <typename ForwardIt>
-    bool IsBefore_Impl (ForwardIt lhs, ForwardIt rhs, BidirectionalIteratorTag)
+    bool _IsBeforeImpl (ForwardIt lhs, ForwardIt rhs, BidirectionalIteratorTag)
     {
         return lhs != rhs;
     }
 
     template <typename ForwardIt>
-    bool IsBefore_Impl (ForwardIt lhs, ForwardIt rhs, RandomAccessIteratorTag)
+    bool _IsBeforeImpl (ForwardIt lhs, ForwardIt rhs, RandomAccessIteratorTag)
     {
         return lhs < rhs;
     }
@@ -68,11 +68,11 @@ namespace Cellwars
     {
         ALGO_CHECK (ForwardIt, ForwardIteratorTag);
 
-        return Distance_Impl (first, last, typename ForwardIt::Category ());
+        return _DistanceImpl (first, last, typename ForwardIt::Category ());
     }
 
     template <typename ForwardIt>
-    unsigned Distance_Impl (ForwardIt first, ForwardIt last, ForwardIteratorTag)
+    unsigned _DistanceImpl (ForwardIt first, ForwardIt last, ForwardIteratorTag)
     {
         unsigned res = 0;
         for (; first != last; ++first)
@@ -84,13 +84,13 @@ namespace Cellwars
     }
 
     template <typename BidirectionIt>
-    unsigned Distance_Impl (BidirectionIt first, BidirectionIt last, BidirectionalIteratorTag)
+    unsigned _DistanceImpl (BidirectionIt first, BidirectionIt last, BidirectionalIteratorTag)
     {
-        return Distance_Impl (first, last, ForwardIteratorTag ());
+        return _DistanceImpl (first, last, ForwardIteratorTag ());
     }
 
     template <typename RandomAccessIt>
-    unsigned Distance_Impl (RandomAccessIt first, RandomAccessIt last, RandomAccessIteratorTag)
+    unsigned _DistanceImpl (RandomAccessIt first, RandomAccessIt last, RandomAccessIteratorTag)
     {
         return last - first;
     }

@@ -27,7 +27,7 @@ namespace Cellwars
         virtual Vector<unsigned> ReleaseIndicesVector () override;
 
     private:
-        void Load_Impl (const char* path);
+        void LoadImpl (const char* path);
         void Clear ();
 
         void InterpretHieroContents (HieroContents& ctx);

@@ -70,7 +70,7 @@ void HieroParser::Load (const char* path)
 {
     try
     {
-        Load_Impl (path);
+        LoadImpl (path);
     }
     catch (...)
     {
@@ -86,7 +86,7 @@ void HieroParser::Clear ()
     v_indices.Clear ();
 }
 
-void HieroParser::Load_Impl (const char* path)
+void HieroParser::LoadImpl (const char* path)
 {
     HieroContents contents;
 
