@@ -7,6 +7,16 @@
 
 #include <iosfwd>
 
+/*! @file String.h
+ *
+ *  Provides string manipulation functionality.
+ *  The String class is basically a Vector<char> with extra member
+ *  functions.
+ *
+ *  You can additionality compare strings, search inside them and
+ *  performing I/O (Get and Getline).
+ */
+
 namespace Cellwars
 {
     class String

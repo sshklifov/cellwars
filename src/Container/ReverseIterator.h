@@ -4,6 +4,14 @@
 #include "IteratorTag.h"
 #include <cstddef>
 
+/*! @file ReverseIterator.h
+ *
+ *  Implementation of iterator pattern for array.
+ *  Declares four classes - ReverseForwardIterator, ReverseBidirectionalIterator,
+ *  ReverseRandomAccessIterator. These implement the tags decribed in
+ *  @sa @file IteratorTag.h for plain array types. Iteration is done in reverse
+ */
+
 namespace Cellwars
 {
     template <typename T>

@@ -4,6 +4,15 @@
 #include "String.h"
 #include <Misc/NewPtr.h>
 
+/*! @file StringStream.h
+ *
+ *  Provides cin/cout like features for String (@sa @file String.h).
+ *  It would be nice if one could treat a string as a stream, with the
+ *  exception that data is not coming from/going to an IO device but
+ *  simply retried from/stored in memory. InputStringStream and OutputStringStream
+ *  do exactly that, respectively.
+ */
+
 namespace Cellwars
 {
     class StringStreamState

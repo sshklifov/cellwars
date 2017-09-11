@@ -6,6 +6,14 @@
 
 #include <initializer_list>
 
+/*! @file Vector.h
+ *
+ *  A dynamic array -- one that resized automatically when needed.
+ *  This container is rudimentary to the whole Container library. Users
+ *  should no worry about how, when and why reallocation happends, only
+ *  that they can feed data and later traverse it.
+ */
+
 namespace Cellwars
 {
     template <typename T>
@@ -50,6 +58,8 @@ namespace Cellwars
 
         template <typename InputIt>
         void PushBack (InputIt it, unsigned n);
+
+        void PopBack ();
 
         void Reserve (unsigned req_size);
         void Resize (unsigned req_size);

@@ -142,6 +142,13 @@ void Cellwars::Vector<T>::PushBack (InputIt it, unsigned n)
 }
 
 template <typename T>
+void Cellwars::Vector<T>::PopBack ()
+{
+    logAssert (!Empty ());
+    Resize (Size () - 1);
+}
+
+template <typename T>
 void Cellwars::Vector<T>::Resize (unsigned req_size)
 {
     if (req_size > Size ())
