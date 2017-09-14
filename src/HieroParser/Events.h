@@ -2,7 +2,7 @@
 #define EVENTS_INCLUDED
 
 #include <Container/Vector.h>
-#include <Misc/NewPtr.h>
+#include <Misc/LocalPtr.h>
 
 namespace Cellwars
 {

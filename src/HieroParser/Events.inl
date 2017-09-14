@@ -1,5 +1,4 @@
 #include "Events.h"
-#include <Misc/NewPtr.h>
 
 template <typename Watcher>
 Cellwars::EventRegisterer<Watcher>::EventRegisterer ()

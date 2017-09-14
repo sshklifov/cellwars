@@ -2,7 +2,7 @@
 #define STRING_STREAM_INCLUDED
 
 #include "String.h"
-#include <Misc/NewPtr.h>
+#include <Misc/LocalPtr.h>
 
 /*! @file StringStream.h
  *

@@ -1,6 +1,6 @@
 #include "Shader.h"
 #include <Container/StringStream.h>
-#include <Misc/NewPtr.h>
+#include <Misc/LocalPtr.h>
 #include <Misc/SourceFile.h>
 #include <logger/logger.h>
 #include <glad/glad.h>

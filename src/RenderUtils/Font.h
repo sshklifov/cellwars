@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 #include <Epsilon/Box.h>
 #include <Epsilon/Vec.h>
-#include <Misc/NewPtr.h>
+#include <Misc/LocalPtr.h>
 #include <Container/BoolVector.h>
 
 namespace Cellwars

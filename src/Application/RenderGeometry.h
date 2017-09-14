@@ -6,7 +6,7 @@
 #include <RenderUtils/Program.h>
 #include <Container/Vector.h>
 #include <Container/String.h>
-#include <Misc/NewPtr.h>
+#include <Misc/LocalPtr.h>
 
 namespace Cellwars
 {

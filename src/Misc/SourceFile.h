@@ -1,7 +1,7 @@
 #ifndef SOURCE_FILE_INCLUDED
 #define SOURCE_FILE_INCLUDED
 
-#include "NewPtr.h"
+#include <Misc/LocalPtr.h>
 
 /*! @file SourceFile.h
  *
