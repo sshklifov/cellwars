@@ -7,4 +7,3 @@
 0.0) box -> public to private
 0.1) make sure that static objects are initialized in proper order
 0.2) documentation @file new lines
-0.3) make SmartPtr.h header, strange behavior
